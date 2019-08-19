@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+  .red{
+    text-align: center;
+    color: red;
+    font-size: 25px;
+  }
+  .box{
+    width: 300px;
+    height: 400px;
+    /* border: 1px solid #000; */
+    margin: 80px auto;
+  }
+  .left{
+    color: black;
+    font-weight: bold;
+    margin: 0;
+  }
+  .left::before{
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: 5px 10px;
+    border-radius: 50%;
+    vertical-align: -9px;
+    background-color: black;
+  }
+  .right{
+    text-align: right;
+    color: green;
+    font-weight: bold;
+    margin: 0;
+  }
+  .right:after{
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: 5px 10px;
+    border-radius: 50%;
+    vertical-align: -9px;
+    background-color: green;
+  }
+  .content{
+    width: 100%;
+    height: 90%;
+    border: 1px solid blue;
+  }
+  .input{
+    width: 100%;
+    height: 10%;
+    border: 1px solid green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .my-input{
+    width: 75%;
+    height: 70%;
+  }
+  </style>
+</head>
+<body> 
+  <p class="red"></p>
+  <div class="box">
+    <div class="content">
+
+    </div>
+    <div class="input">
+      <input class="my-input"></input>
+      <button onclick="sendMsg()">发送</button>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // import io from 'socket.io'
+    const red = document.getElementsByClassName('red')[0]
+    const myInput = document.getElementsByClassName('my-input')[0]
+    const content = document.getElementsByClassName('content')[0]
+    var socket = io('http://127.0.0.1:3000');
+    socket.on('connect', () => {
+
+      socket.on('disconnect', () => {
+        alert('服务器断开连接')
+      }) 
+
+      socket.on('people', (data) => {
+        console.log(123);
+        red.innerText = '当前' + data.people + '人在线'
+      })
+
+      socket.on('msg', (data) => {
+        const el = document.createElement('p')
+        el.innerText = data.msg
+        el.className = 'left'
+        content.appendChild(el)
+      })
+
+    })
+
+    // 事件
+    function sendMsg() {
+      const el = document.createElement('p')
+      el.innerText = myInput.value
+      el.className = 'right'
+      socket.emit('msg', myInput.value)
+      content.appendChild(el)
+      myInput.value = ''
+    }
+    </script>
+</body>
+</html>
